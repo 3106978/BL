@@ -4,96 +4,69 @@
     <meta charset="utf-8" />
     <title>SearchGitHub</title>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular.min.js"></script>
-    <style>
-        body {
-            background-color: antiquewhite;
-            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-            font-size: large;
-        }
-
-        table, th, td {
-            border: 1px solid black;
-            border-collapse: collapse;
-            padding: 5px;
-        }
-
-            table tr:nth-child(odd) {
-                background-color: #d4c7c7;
-            }
-
-            table tr:nth-child(even) {
-                background-color: #ffffff;
-            }
-
-        img {
-            width: 100px;
-            height: auto;
-        }
-
-        div {
-            margin-top: 50px;
-            margin-left: auto;
-            margin-right: auto;
-            align-content: center;
-            text-align: center;
-        }
-    </style>
+    <link href="css/index.css" rel="stylesheet" />
 </head>
 <body>
     <div ng-app="app" ng-controller="controller" ng-init="apiToSearch">
         Enter your search key word to found tne GitHub Repository: <input type="text" ng-model="inputApi" autofocus ng-keypress="enterPressed($event)" required />
-        <button ng-click="buttonDisable||getAPI()" ng-disabled="buttonDisable" ng-model="tableDiv">Search</button>
+        <button ng-click="buttonDisable || getAPI()" ng-disabled="buttonDisable" ng-model="tableDiv">Search</button>
+        <div id="messageDiv"><p>{{message}}</p></div>
 
-        <p>{{message}}</p>
-        <div>
-            <table>
-                <tr ng-repeat="r in repositories">
-                    <td><img src="{{r.owner.avatar_url}}" alt="avatar" /></td>
-                    <td>{{r.name}}</td>
-                    <td><button ng-click="AddToBookmarks(r.owner.html_url)">Add to bookmarks</button></td>
-                </tr>
-            </table>
+        <div ng-repeat="r in repositories" style="display:inline-block">
+            <img src="{{r.owner.avatar_url}}" alt="avatar" />
+            <p>{{r.name}}</p><button ng-click="AddToBookmarks(r.owner.html_url)">Add to bookmarks</button>
         </div>
     </div>
 
     <script>
         var app = angular.module("app", []);
-        app.controller("controller", function ($scope, $http) {
+        app.controller("controller", function ($scope, $http, $timeout) {
+
+            $scope.DeleteMessage = function myfunction() {
+                $scope.message = "";
+            }
+
 
             $scope.enterPressed = function (event) {
                 if (event.keyCode == 13)
                     return $scope.getAPI();
             };
             $scope.getAPI = function () {
-                if ($scope.inputApi==null||$scope.inputApi.length == 0) {
+                $scope.message = "";
+                if ($scope.inputApi == null || $scope.inputApi.length == 0) {
                     $scope.message = "Please, enter the data";
+                    $timeout($scope.DeleteMessage, 1000);
                     return $scope.message;
                 }
+
                 var url = "https://api.github.com/search/repositories?q=" + $scope.inputApi;
 
                 $http.get(url).success(function (data) {
                     $scope.repositories = data.items;
-                    if ($scope.repositories === null || $scope.repositories.total_count == 0) {
+                    if ($scope.repositories === null || $scope.repositories.length == 0) {
                         $scope.message = "The data is not found";
-                        return $scope.message;
+                        $timeout($scope.DeleteMessage, 1000);
                     }
                 });
+
             }
+
+
             $scope.AddToBookmarks = function (url) {
                 $scope.message = "";
                 $scope.bookmarks = [];
                 $scope.bookmarks.push(url);
-                $http.get("api/Bookmarks?url="+ url).then(function (response) {
+                $http.get("api/Bookmarks?url=" + url).then(function (response) {
                     if (!response.data) {
                         $scope.message = "Oops, the repository is not added to your bookmarks. Please, try again";
+                        $timeout($scope.DeleteMessage, 1000);
                         return $scope.message;
                     }
                     $scope.message = "Added succesfully!";
-                    return $scope.message;
+                    $timeout($scope.DeleteMessage, 1000);
                 });
             }
         });
-
 
     </script>
 </body>
