@@ -15,13 +15,13 @@
 
         <div ng-repeat="r in repositories" style="display:inline-block">
             <img src="{{r.owner.avatar_url}}" alt="avatar" />
-            <p>{{r.name}}</p><button ng-click="AddToBookmarks(r.owner.html_url)">Add to bookmarks</button>
+            <p>{{r.name}}</p><button ng-click="AddToBookmarks(r.owner.html_url, r.id)">Add to bookmarks</button>
         </div>
     </div>
 
     <script>
         var app = angular.module("app", []);
-        app.controller("controller", function ($scope, $http, $timeout) {
+        app.controller("controller", function ($scope, $http, $timeout, $window) {
 
             $scope.DeleteMessage = function myfunction() {
                 $scope.message = "";
@@ -35,7 +35,7 @@
             $scope.getAPI = function () {
                 $scope.message = "";
                 if ($scope.inputApi == null || $scope.inputApi.length == 0) {
-                    $scope.message = "Please, enter the data";
+                    $scope.message = "Please, enter a data";
                     $timeout($scope.DeleteMessage, 1000);
                     return $scope.message;
                 }
@@ -53,16 +53,17 @@
             }
 
 
-            $scope.AddToBookmarks = function (url) {
+            $scope.AddToBookmarks = function (url, id) {
                 $scope.message = "";
                 $scope.bookmarks = [];
                 $scope.bookmarks.push(url);
-                $http.get("api/Bookmarks?url=" + url).then(function (response) {
+                $http.get("api/Bookmarks?url=" + url).then(function (response) {//I added this function to allow bookmarks to be stored on the server too.
                     if (!response.data) {
                         $scope.message = "Oops, the repository is not added to your bookmarks. Please, try again";
                         $timeout($scope.DeleteMessage, 1000);
                         return $scope.message;
                     }
+                    $window.sessionStorage.setItem(id, url); 
                     $scope.message = "Added succesfully!";
                     $timeout($scope.DeleteMessage, 1000);
                 });
