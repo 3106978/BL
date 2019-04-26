@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SerchingOfGitHubRepositories.Models;
 
 namespace SerchingOfGitHubRepositories.Controllers
 {
@@ -11,17 +12,14 @@ namespace SerchingOfGitHubRepositories.Controllers
     [ApiController]
     public class BookmarksController : ControllerBase
     {
-        public static List<string> Bookmarks=new List<string> ();
-
-
         [HttpGet]
         public bool AddRepository( [FromQuery]string url)
         {
             if (url == null || url.Length == 0)
                 return false;
-            if (!Bookmarks.Contains(url))
+            if (!Bookmark.Bookmarks.Contains(url))
             {
-                Bookmarks.Add(url);
+                Bookmark.Bookmarks.Add(url);
             }
 
             return true;
