@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SerchingOfGitHubRepositories.Models;
+using System.Web;
 
 namespace SerchingOfGitHubRepositories.Controllers
 {
@@ -13,15 +14,11 @@ namespace SerchingOfGitHubRepositories.Controllers
     public class BookmarksController : ControllerBase
     {
         [HttpGet]
-        public bool AddRepository( [FromQuery]string url)
+        public bool AddRepository( [FromQuery]string url, [FromQuery] string id )
         {
-            if (url == null || url.Length == 0)
+            if (string.IsNullOrEmpty(url)|| string.IsNullOrEmpty(id))
                 return false;
-            if (!Bookmark.Bookmarks.Contains(url))
-            {
-                Bookmark.Bookmarks.Add(url);
-            }
-
+            HttpContext.Session.SetString(id, url);
             return true;
         }
     }

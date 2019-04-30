@@ -57,7 +57,7 @@
                 $scope.message = "";
                 $scope.bookmarks = [];
                 $scope.bookmarks.push(url);
-                $http.get("api/Bookmarks?url=" + url).then(function (response) {//I added this function to allow bookmarks to be stored on the server too.
+                $http.get("api/Bookmarks?url=" + url + "&id="+id).then(function (response) {//I added this function to allow bookmarks to be stored on the server too.
                     if (!response.data) {
                         $scope.message = "Oops, the repository is not added to your bookmarks. Please, try again";
                         $timeout($scope.DeleteMessage, 1000);
